@@ -1,0 +1,15 @@
+# request history is per-user and churns every send
+history/
+# environments hold credentials — share one with `git add -f <file>`
+*.env
+!*.example.env
+# ad-hoc secret material
+*.secret
+# open-tabs working set, per-user
+.session.json
+# per-machine index of which AI providers have a key
+.ai-keys.json
+# per-machine marker that a BYO SSH key is configured
+.git-ssh
+# per-machine marker that HTTPS git credentials are set
+.git-https

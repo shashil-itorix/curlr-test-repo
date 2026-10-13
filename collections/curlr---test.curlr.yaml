@@ -1,0 +1,91 @@
+openapi: 3.1.0
+info:
+  title: Curlr - Test
+  version: 1.0.0
+servers:
+- url: https://curlr.dev
+paths:
+  /api/health:
+    get:
+      summary: Curlr health check
+      responses:
+        default:
+          description: Response
+      x-curlr:
+        request:
+          url: https://curlr.dev/api/health
+          auth: null
+  /api/waitlist:
+    post:
+      summary: Post waitlist email
+      parameters:
+      - name: Content-Type
+        in: header
+        schema:
+          type: string
+        example: application/json
+      requestBody:
+        content:
+          application/json:
+            example:
+              company: apiwiz
+              email: you@company.com
+              source: nav
+      responses:
+        default:
+          description: Response
+      x-curlr:
+        request:
+          url: https://curlr.dev/api/waitlist
+          auth: null
+  /api/admin/summary:
+    get:
+      summary: Get Summary for Admins
+      parameters:
+      - name: Authorization
+        in: header
+        schema:
+          type: string
+        example: Bearer 9bc864a6a4ad2a6d9e35e84b0c8e429906fba1be60f6a894
+      responses:
+        default:
+          description: Response
+      x-curlr:
+        request:
+          url: https://curlr.dev/api/admin/summary
+          auth: null
+  /api/admin/signups:
+    get:
+      summary: Get Overall Signups
+    delete:
+      summary: Delete Signup request
+      parameters:
+      - name: email
+        in: query
+        schema:
+          type: string
+        example: ikramuddin.s@apiwiz.com
+      - name: Authorization
+        in: header
+        schema:
+          type: string
+        example: Bearer 9bc864a6a4ad2a6d9e35e84b0c8e429906fba1be60f6a894
+      responses:
+        default:
+          description: Response
+      x-curlr:
+        request:
+          url: https://curlr.dev/api/admin/signups?email=ikramuddin.s@apiwiz.com
+          auth: null
+  /new-request:
+    get:
+      summary: New Request
+      responses:
+        default:
+          description: Response
+      x-curlr:
+        request:
+          url: ''
+          params: []
+          headers: []
+          body: ''

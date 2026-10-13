@@ -1,0 +1,5 @@
+# curlr workspace configuration
+theme: system
+default_env: development
+history:
+  rotate: monthly
