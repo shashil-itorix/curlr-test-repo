@@ -13,3 +13,6 @@ history/
 .git-ssh
 # per-machine marker that HTTPS git credentials are set
 .git-https
+production.env
+# encrypted machine-local private data — never share
+private-vault/

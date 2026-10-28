@@ -1,0 +1,208 @@
+openapi: 3.1.0
+info:
+  title: Orders API
+  version: 1.0.0
+  description: A local demo API with synthetic orders for recording curlr workflows. No authentication is required. List orders with status and limit query parameters. Supported statuses are paid, pending, shipped and canceled. The sample order ord_1042 has a numeric total of 49.99 in healthy mode.
+servers:
+- url: http://127.0.0.1:4781
+paths:
+  /health:
+    get:
+      summary: Check service
+      operationId: health
+      responses:
+        '200':
+          description: The demo service is ready.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - service
+                - status
+                - scenario
+                - orders
+                properties:
+                  service:
+                    type: string
+                  status:
+                    type: string
+                    const: ok
+                  scenario:
+                    type: string
+                    enum:
+                    - healthy
+                    - total-as-string
+                  orders:
+                    type: integer
+                    minimum: 0
+      x-curlr:
+        request:
+          url: '{{host}}/health'
+          auth: null
+  /orders:
+    get:
+      summary: List orders
+      description: Filter by status and choose how many orders to return. Use status=paid and limit=5 for five paid orders. An unsupported status returns 400.
+      operationId: listOrders
+      parameters:
+      - name: status
+        in: query
+        schema:
+          type: string
+        example: paid
+      - name: limit
+        in: query
+        schema:
+          type: string
+        example: '3'
+      responses:
+        '200':
+          description: Matching orders and the total matching count before limiting.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - data
+                - total
+                - limit
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Order'
+                  total:
+                    type: integer
+                    minimum: 0
+                  limit:
+                    type: integer
+                    minimum: 1
+                    maximum: 100
+        '400':
+          $ref: '#/components/responses/BadRequest'
+      x-curlr:
+        request:
+          url: '{{host}}/orders?status=paid&limit=3'
+          auth: null
+    post:
+      summary: Create order
+      description: Create an in-memory order. Resetting or restarting the service restores the original demo data.
+      operationId: createOrder
+      requestBody:
+        content:
+          application/json:
+            example:
+              currency: USD
+              customer: Morgan Ellis
+              status: pending
+              total: 79.99
+      responses:
+        '201':
+          description: Created order.
+          headers:
+            Location:
+              description: URL path of the created order.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '413':
+          $ref: '#/components/responses/BadRequest'
+        '415':
+          $ref: '#/components/responses/BadRequest'
+        '422':
+          $ref: '#/components/responses/BadRequest'
+        '409':
+          $ref: '#/components/responses/BadRequest'
+      x-curlr:
+        request:
+          url: '{{host}}/orders'
+          auth: null
+  /orders/ord_1042:
+    get:
+      summary: Get order
+      description: A ready-to-send concrete sample URL. The service also accepts GET /orders/{orderId} for other orders. In healthy mode total is a number. The recording control deliberately returns it as a string in broken mode while keeping HTTP 200, demonstrating a contract regression.
+      operationId: getOrder
+      responses:
+        '200':
+          description: Sample order. Healthy response matches this schema.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+              example:
+                id: ord_1042
+                customer: Maya Rao
+                total: 49.99
+                currency: USD
+                status: paid
+        '404':
+          $ref: '#/components/responses/BadRequest'
+      x-curlr:
+        request:
+          url: '{{host}}/orders/ord_1042'
+          auth: null
+components:
+  schemas:
+    OrderStatus:
+      type: string
+      enum:
+      - paid
+      - pending
+      - shipped
+      - canceled
+    Order:
+      type: object
+      additionalProperties: false
+      required:
+      - id
+      - customer
+      - total
+      - currency
+      - status
+      properties:
+        id:
+          type: string
+          example: ord_1042
+        customer:
+          type: string
+          example: Maya Rao
+        total:
+          type: number
+          exclusiveMinimum: 0
+          maximum: 100000
+          example: 49.99
+        currency:
+          type: string
+          const: USD
+        status:
+          $ref: '#/components/schemas/OrderStatus'
+    Error:
+      type: object
+      required:
+      - error
+      properties:
+        error:
+          type: string
+        field:
+          type: string
+        received:
+          type: string
+        allowed:
+          type: array
+          items:
+            type: string
+        message:
+          type: string
+  responses:
+    BadRequest:
+      description: Invalid request, unsupported content, missing order or demo capacity limit. Read the error message for the next action.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'

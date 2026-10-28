@@ -2,28 +2,46 @@ openapi: 3.1.0
 info:
   title: Curlr - Test
   version: 1.0.0
+  x-curlr:
+    headers:
+    - key: Authorization
+      value: keychain:document:c54f58a678f3dbf0109c7d24374925e773a0342ae530ead8
 servers:
 - url: https://curlr.dev
 paths:
   /api/health:
     get:
       summary: Curlr health check
+      parameters:
+      - name: key
+        in: query
+        schema:
+          type: string
+        example: value
+      - name: jsessionid
+        in: header
+        schema:
+          type: string
+        example: '12345'
+      - $ref: '#/components/parameters/curlr.header.Authorization'
       responses:
         default:
           description: Response
       x-curlr:
+        favorite: false
         request:
-          url: https://curlr.dev/api/health
+          url: https://curlr.dev/api/health?key=value
           auth: null
   /api/waitlist:
     post:
-      summary: Post waitlist email
+      summary: Post waitlist emails
       parameters:
       - name: Content-Type
         in: header
         schema:
           type: string
         example: application/json
+      - $ref: '#/components/parameters/curlr.header.Authorization'
       requestBody:
         content:
           application/json:
@@ -35,6 +53,7 @@ paths:
         default:
           description: Response
       x-curlr:
+        favorite: false
         request:
           url: https://curlr.dev/api/waitlist
           auth: null
@@ -42,50 +61,44 @@ paths:
     get:
       summary: Get Summary for Admins
       parameters:
-      - name: Authorization
-        in: header
-        schema:
-          type: string
-        example: Bearer 9bc864a6a4ad2a6d9e35e84b0c8e429906fba1be60f6a894
+      - $ref: '#/components/parameters/curlr.header.Authorization'
       responses:
         default:
           description: Response
       x-curlr:
+        favorite: false
         request:
           url: https://curlr.dev/api/admin/summary
           auth: null
   /api/admin/signups:
     get:
       summary: Get Overall Signups
+      parameters:
+      - $ref: '#/components/parameters/curlr.header.Authorization'
+      x-curlr:
+        favorite: false
     delete:
-      summary: Delete Signup request
+      summary: Delete Signup requests
       parameters:
       - name: email
         in: query
         schema:
           type: string
         example: ikramuddin.s@apiwiz.com
-      - name: Authorization
-        in: header
-        schema:
-          type: string
-        example: Bearer 9bc864a6a4ad2a6d9e35e84b0c8e429906fba1be60f6a894
+      - $ref: '#/components/parameters/curlr.header.Authorization'
       responses:
         default:
           description: Response
       x-curlr:
+        favorite: true
         request:
           url: https://curlr.dev/api/admin/signups?email=ikramuddin.s@apiwiz.com
           auth: null
-  /new-request:
-    get:
-      summary: New Request
-      responses:
-        default:
-          description: Response
-      x-curlr:
-        request:
-          url: ''
-          params: []
-          headers: []
-          body: ''
+components:
+  parameters:
+    curlr.header.Authorization:
+      name: Authorization
+      in: header
+      schema:
+        type: string
+      example: keychain:document:c54f58a678f3dbf0109c7d24374925e773a0342ae530ead8
