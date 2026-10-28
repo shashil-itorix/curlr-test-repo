@@ -160,7 +160,7 @@ paths:
         in: query
         schema:
           type: string
-        example: USD
+        example: EUR
       - name: Content-Type
         in: header
         schema:
@@ -197,7 +197,7 @@ paths:
           description: Response
       x-curlr:
         request:
-          url: '{{host}}/orders/quote?channel=web&currency=USD'
+          url: '{{host}}/orders/quote?channel=web&currency=EUR'
           auth: null
           postScript: |-
             curlr.test("requestId is present", () => {
