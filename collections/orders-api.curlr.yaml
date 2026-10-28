@@ -55,7 +55,7 @@ paths:
         in: query
         schema:
           type: string
-        example: '3'
+        example: '10'
       responses:
         '200':
           description: Matching orders and the total matching count before limiting.
@@ -83,7 +83,7 @@ paths:
           $ref: '#/components/responses/BadRequest'
       x-curlr:
         request:
-          url: '{{host}}/orders?status=paid&limit=3'
+          url: '{{host}}/orders?status=paid&limit=10'
           auth: null
     post:
       summary: Create order
@@ -147,6 +147,62 @@ paths:
         request:
           url: '{{host}}/orders/ord_1042'
           auth: null
+  /orders/quote:
+    post:
+      summary: Quote Orders
+      parameters:
+      - name: channel
+        in: query
+        schema:
+          type: string
+        example: web
+      - name: currency
+        in: query
+        schema:
+          type: string
+        example: USD
+      - name: Content-Type
+        in: header
+        schema:
+          type: string
+        example: application/json
+      - name: Accept
+        in: header
+        schema:
+          type: string
+        example: application/json
+      - name: X-Request-Id
+        in: header
+        schema:
+          type: string
+        example: linkedin-demo-001
+      requestBody:
+        content:
+          application/json:
+            example:
+              coupon: WELCOME10
+              customer:
+                email: maya@example.test
+                name: Maya Rao
+              items:
+              - quantity: 1
+                sku: KEYBOARD-75
+              - quantity: 2
+                sku: DESK-MAT
+              shipping:
+                country: US
+                method: standard
+      responses:
+        default:
+          description: Response
+      x-curlr:
+        request:
+          url: '{{host}}/orders/quote?channel=web&currency=USD'
+          auth: null
+          postScript: |-
+            curlr.test("requestId is present", () => {
+              curlr.expect(curlr.response.json()).to.have.property("requestId");
+            });
 components:
   schemas:
     OrderStatus:
